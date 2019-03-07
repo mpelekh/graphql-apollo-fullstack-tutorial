@@ -3,8 +3,17 @@ import ReactDOM from "react-dom";
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { HttpLink } from 'apollo-link-http';
-import { ApolloProvider } from 'react-apollo';
+import { Query, ApolloProvider } from 'react-apollo';
+import gql from 'graphql-tag';
 import Pages from "./pages";
+import Login from './pages/login';
+import {resolvers, typeDefs} from './resolvers';
+
+const IS_LOGGED_IN = gql`
+  query IsUserLoggedIn {
+    isLoggedIn @client
+  }
+`;
 
 const cache = new InMemoryCache();
 const link = new HttpLink({
@@ -12,6 +21,8 @@ const link = new HttpLink({
     headers: {
         authorization: localStorage.getItem('token'),
     },
+    resolvers,
+    typeDefs,
 });
 const client = new ApolloClient({
     cache,
@@ -27,5 +38,7 @@ cache.writeData({
 
 ReactDOM.render(
     <ApolloProvider client={client}>
-        <Pages />
+        <Query query={IS_LOGGED_IN}>
+            {({ data }) => (data.isLoggedIn ? <Pages /> : <Login />)}
+        </Query>
     </ApolloProvider>, document.getElementById('root'));
