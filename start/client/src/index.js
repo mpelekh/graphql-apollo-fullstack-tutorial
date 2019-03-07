@@ -21,12 +21,12 @@ const link = new HttpLink({
     headers: {
         authorization: localStorage.getItem('token'),
     },
-    resolvers,
-    typeDefs,
 });
 const client = new ApolloClient({
     cache,
-    link
+    link,
+    resolvers,
+    typeDefs,
 });
 
 cache.writeData({
